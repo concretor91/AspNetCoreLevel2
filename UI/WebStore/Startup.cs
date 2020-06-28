@@ -12,10 +12,10 @@ using WebStore.DAL.Context;
 using WebStore.Data;
 using WebStore.Domain.Entities.Identity;
 using WebStore.Infrastructure.AutoMapperPropfiles;
-using WebStore.Infrastructure.Services.InCookies;
 using WebStore.Infrastructure.Services.InSQL;
 using WebStore.Interfaces;
 using WebStore.Interfaces.Services;
+using WebStore.Services.InCookies;
 
 namespace WebStore
 {

@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using WebStore.DAL.Context;
 using WebStore.Domain.Entities.Identity;
 using WebStore.Domain.Entities.Orders;
@@ -26,7 +26,7 @@ namespace WebStore.Infrastructure.Services.InSQL
         public async Task<Order> CreateOrder(string UserName, CartViewModel Cart, OrderViewModel OrderModel)
         {
             var user = await _UserManager.FindByNameAsync(UserName);
-            if(user is null) throw new InvalidOperationException($"Пользователь {UserName} не найден в БД");
+            if (user is null) throw new InvalidOperationException($"Пользователь {UserName} не найден в БД");
 
             await using var transaction = await _db.Database.BeginTransactionAsync();
 
@@ -43,7 +43,7 @@ namespace WebStore.Infrastructure.Services.InSQL
             foreach (var (product_model, quantity) in Cart.Items)
             {
                 var product = await _db.Products.FindAsync(product_model.Id);
-                if(product is null) throw new InvalidOperationException($"Товар id:{product_model.Id} не найден в БД");
+                if (product is null) throw new InvalidOperationException($"Товар id:{product_model.Id} не найден в БД");
 
                 var order_item = new OrderItem
                 {
