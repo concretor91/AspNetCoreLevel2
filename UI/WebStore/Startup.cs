@@ -7,12 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WebStore.Clients.Services.Values;
 using WebStore.DAL.Context;
 using WebStore.Data;
 using WebStore.Domain.Entities.Identity;
 using WebStore.Infrastructure.AutoMapperPropfiles;
 using WebStore.Infrastructure.Services.InCookies;
 using WebStore.Infrastructure.Services.InSQL;
+using WebStore.Interfaces;
 using WebStore.Interfaces.Services;
 
 namespace WebStore
@@ -81,6 +83,11 @@ namespace WebStore
             services.AddScoped<IProductData, SqlProductData>();
             services.AddScoped<ICartService, CookiesCartService>();
             services.AddScoped<IOrderService, SqlOrderService>();
+
+            services.AddHttpClient<IValuesService, ValuesClient>(client =>
+            {
+                client.BaseAddress = new Uri(Configuration["ClientAdress"]);
+            });
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WebStoreDBInitializer db)
