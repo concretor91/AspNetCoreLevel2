@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,8 +14,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using WebStore.DAL.Context;
 using WebStore.Data;
+using WebStore.Domain.Entities.Identity;
 using WebStore.Infrastructure.Services.InSQL;
 using WebStore.Interfaces.Services;
+using WebStore.Services.Products.InSQL;
 
 namespace WebStore.ServicesHosting
 {
@@ -32,12 +35,37 @@ namespace WebStore.ServicesHosting
         {
             services.AddDbContext<WebStoreDB>(opt =>
                 opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            //services.AddTransient<WebStoreDBInitializer>();
+            services.AddTransient<WebStoreDBInitializer>();
+
+            services.AddIdentity<User, Role>()
+               .AddEntityFrameworkStores<WebStoreDB>()
+               .AddDefaultTokenProviders();
+
+            services.Configure<IdentityOptions>(opt =>
+            {
+#if DEBUG
+                opt.Password.RequiredLength = 3;
+                opt.Password.RequireDigit = false;
+                opt.Password.RequireLowercase = false;
+                opt.Password.RequireUppercase = false;
+                opt.Password.RequireNonAlphanumeric = false;
+                opt.Password.RequiredUniqueChars = 3;
+
+                //opt.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCD1234567890";
+                opt.User.RequireUniqueEmail = false;
+#endif
+
+                opt.Lockout.AllowedForNewUsers = true;
+                opt.Lockout.MaxFailedAccessAttempts = 10;
+                opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+            });
 
             services.AddControllers();
 
             services
-               .AddScoped<IEmployeesData, SqlEmployeesData>();
+               .AddScoped<IEmployeesData, SqlEmployeesData>()
+               .AddScoped<IOrderService, SqlOrderService>()
+               .AddScoped<IProductData, SqlProductData>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

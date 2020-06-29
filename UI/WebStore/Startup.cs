@@ -8,15 +8,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebStore.Clients.Employees;
+using WebStore.Clients.Orders;
+using WebStore.Clients.Products;
 using WebStore.Clients.Services.Values;
 using WebStore.DAL.Context;
 using WebStore.Data;
 using WebStore.Domain.Entities.Identity;
 using WebStore.Infrastructure.AutoMapperPropfiles;
-using WebStore.Infrastructure.Services.InSQL;
 using WebStore.Interfaces;
 using WebStore.Interfaces.Services;
-using WebStore.Services.InCookies;
+using WebStore.Services.Products.InCookies;
 
 namespace WebStore
 {
@@ -81,9 +82,9 @@ namespace WebStore
             //services.AddSingleton<IEmployeesData, InMemoryEmployeesData>();
 
             //services.AddSingleton<IProductData, InMemoryProductData>();
-            services.AddScoped<IProductData, SqlProductData>();
+            //services.AddScoped<IProductData, SqlProductData>();
             services.AddScoped<ICartService, CookiesCartService>();
-            services.AddScoped<IOrderService, SqlOrderService>();
+           //services.AddScoped<IOrderService, SqlOrderService>();
 
             services.AddHttpClient<IValuesService, ValuesClient>(client =>
             {
@@ -93,6 +94,16 @@ namespace WebStore
             services.AddHttpClient<IEmployeesData, EmployeesClient>(client =>
             {
                 client.BaseAddress = new Uri(Configuration["EmployeeAdress"]);
+            });
+
+            services.AddHttpClient<IOrderService, OrdersClient>(client =>
+            {
+                client.BaseAddress = new Uri(Configuration["OrderAddress"]);
+            });
+
+            services.AddHttpClient<IProductData, ProductsClient>(client =>
+            {
+                client.BaseAddress = new Uri(Configuration["ProductAdress"]);
             });
         }
 

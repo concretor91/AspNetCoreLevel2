@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using System.Linq;
 using WebStore.Domain.Entities;
 using WebStore.Domain.Models;
 using WebStore.Domain.ViewModels;
 using WebStore.Interfaces.Services;
 using WebStore.Services.Mapping;
 
-namespace WebStore.Services.InCookies
+namespace WebStore.Services.Products.InCookies
 {
     public class CookiesCartService : ICartService
     {
@@ -103,7 +103,7 @@ namespace WebStore.Services.InCookies
                 Ids = Cart.Items.Select(item => item.ProductId).ToArray()
             });
 
-            var product_view_models = products.ToView().ToDictionary(p => p.Id);
+            var product_view_models = products.Select(p => p.FromDTO()).ToView().ToDictionary(p => p.Id);
 
             return new CartViewModel
             {

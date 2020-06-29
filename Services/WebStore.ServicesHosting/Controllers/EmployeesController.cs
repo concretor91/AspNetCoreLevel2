@@ -9,11 +9,11 @@ namespace WebStore.ServiceHosting.Controllers
     [Route("api/employees")]
     //[Route(WebAPI.Employees)]
     [ApiController]
-    public class EmployeesApiController : ControllerBase, IEmployeesData
+    public class EmployeesController : ControllerBase, IEmployeesData
     {
         private readonly IEmployeesData _EmployeesData;
 
-        public EmployeesApiController(IEmployeesData EmployeesData) => _EmployeesData = EmployeesData;
+        public EmployeesController(IEmployeesData EmployeesData) => _EmployeesData = EmployeesData;
 
         [HttpGet]
         public IEnumerable<Employee> Get() => _EmployeesData.Get();
