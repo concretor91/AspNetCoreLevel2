@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WebStore.Clients.Employees;
 using WebStore.Clients.Services.Values;
 using WebStore.DAL.Context;
 using WebStore.Data;
@@ -76,7 +77,7 @@ namespace WebStore
             services.AddControllersWithViews()
                .AddRazorRuntimeCompilation();
 
-            services.AddScoped<IEmployeesData, SqlEmployeesData>();
+            //services.AddScoped<IEmployeesData, SqlEmployeesData>();
             //services.AddSingleton<IEmployeesData, InMemoryEmployeesData>();
 
             //services.AddSingleton<IProductData, InMemoryProductData>();
@@ -87,6 +88,11 @@ namespace WebStore
             services.AddHttpClient<IValuesService, ValuesClient>(client =>
             {
                 client.BaseAddress = new Uri(Configuration["ClientAdress"]);
+            });
+
+            services.AddHttpClient<IEmployeesData, EmployeesClient>(client =>
+            {
+                client.BaseAddress = new Uri(Configuration["EmployeeAdress"]);
             });
         }
 

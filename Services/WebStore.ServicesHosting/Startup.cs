@@ -6,10 +6,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using WebStore.DAL.Context;
+using WebStore.Data;
+using WebStore.Infrastructure.Services.InSQL;
+using WebStore.Interfaces.Services;
 
 namespace WebStore.ServicesHosting
 {
@@ -25,7 +30,14 @@ namespace WebStore.ServicesHosting
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<WebStoreDB>(opt =>
+                opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            //services.AddTransient<WebStoreDBInitializer>();
+
             services.AddControllers();
+
+            services
+               .AddScoped<IEmployeesData, SqlEmployeesData>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
