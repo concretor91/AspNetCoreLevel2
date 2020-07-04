@@ -8,7 +8,7 @@ using WebStore.Interfaces.Services;
 
 namespace WebStore.ServiceHosting.Controllers
 {
-    [Route("api/orders")]
+    [Route(WebAPI.Orders)]
     [ApiController]
     public class OrdersController : ControllerBase, IOrderService
     {

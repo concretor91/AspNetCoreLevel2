@@ -11,6 +11,8 @@ namespace WebStore.Clients.Services.Values
     {
         private readonly HttpClient client;
 
+        private string address = "api/values/";
+
         public ValuesClient(HttpClient client)
         {
             this.client = client;
@@ -19,7 +21,7 @@ namespace WebStore.Clients.Services.Values
         public async Task<IEnumerable<string>> GetAsync()
         {
             var list = new List<string>();
-            var response = await client.GetAsync("");
+            var response = await client.GetAsync(address);
             if (response.IsSuccessStatusCode)
             {
                 list = await response.Content.ReadAsAsync<List<string>>();
@@ -29,7 +31,7 @@ namespace WebStore.Clients.Services.Values
         public string Get(int id)
         {
             var result = string.Empty;
-            var response = client.GetAsync($"/get/{id}").Result;
+            var response = client.GetAsync($"{address}/get/{id}").Result;
             if (response.IsSuccessStatusCode)
             {
                 result = response.Content.ReadAsAsync<string>().Result;
@@ -39,7 +41,7 @@ namespace WebStore.Clients.Services.Values
         public async Task<string> GetAsync(int id)
         {
             var result = string.Empty;
-            var response = await client.GetAsync($"/get/{id}");
+            var response = await client.GetAsync($"{address}/get/{id}");
             if (response.IsSuccessStatusCode)
             {
                 result = await response.Content.ReadAsAsync<string>();
@@ -48,7 +50,7 @@ namespace WebStore.Clients.Services.Values
         }
         public Uri Post(string value)
         {
-            var response = client.PostAsJsonAsync($"/post",
+            var response = client.PostAsJsonAsync($"{address}/post",
             value).Result;
             response.EnsureSuccessStatusCode();
             return response.Headers.Location;
@@ -56,13 +58,13 @@ namespace WebStore.Clients.Services.Values
         public async Task<Uri> PostAsync(string value)
         {
             var response = await
-            client.PostAsJsonAsync($"/post", value);
+            client.PostAsJsonAsync($"{address}/post", value);
             response.EnsureSuccessStatusCode();
             return response.Headers.Location;
         }
         public HttpStatusCode Put(int id, string value)
         {
-            var response = client.PutAsJsonAsync($"/put/{id}",
+            var response = client.PutAsJsonAsync($"{address}/put/{id}",
             value).Result;
             response.EnsureSuccessStatusCode();
             return response.StatusCode;
@@ -70,20 +72,20 @@ namespace WebStore.Clients.Services.Values
         public async Task<HttpStatusCode> PutAsync(int id, string value)
         {
             var response = await
-            client.PutAsJsonAsync($"/put/{id}", value);
+            client.PutAsJsonAsync($"{address}/put/{id}", value);
             response.EnsureSuccessStatusCode();
             return response.StatusCode;
         }
         public HttpStatusCode Delete(int id)
         {
             var response =
-            client.DeleteAsync($"/delete/{id}").Result;
+            client.DeleteAsync($"{address}/delete/{id}").Result;
             return response.StatusCode;
         }
         public async Task<HttpStatusCode> DeleteAsync(int id)
         {
             var response = await
-            client.DeleteAsync($"/delete/{id}");
+            client.DeleteAsync($"{address}/delete/{id}");
             return response.StatusCode;
         }
     }

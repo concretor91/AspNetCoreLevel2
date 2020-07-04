@@ -93,17 +93,17 @@ namespace WebStore
 
             services.AddHttpClient<IEmployeesData, EmployeesClient>(client =>
             {
-                client.BaseAddress = new Uri(Configuration["EmployeeAdress"]);
+                client.BaseAddress = new Uri(Configuration["ClientAdress"]);
             });
 
             services.AddHttpClient<IOrderService, OrdersClient>(client =>
             {
-                client.BaseAddress = new Uri(Configuration["OrderAddress"]);
+                client.BaseAddress = new Uri(Configuration["ClientAdress"]);
             });
 
             services.AddHttpClient<IProductData, ProductsClient>(client =>
             {
-                client.BaseAddress = new Uri(Configuration["ProductAdress"]);
+                client.BaseAddress = new Uri(Configuration["ClientAdress"]);
             });
         }
 

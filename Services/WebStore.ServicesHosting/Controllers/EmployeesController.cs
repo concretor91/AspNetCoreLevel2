@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using WebStore.Domain;
 using WebStore.Domain.Entities.Employees;
 using WebStore.Interfaces.Services;
 
 namespace WebStore.ServiceHosting.Controllers
 {
-    //[Route("api/[controller]")]
-    [Route("api/employees")]
-    //[Route(WebAPI.Employees)]
+    [Route(WebAPI.Employees)]
     [ApiController]
     public class EmployeesController : ControllerBase, IEmployeesData
     {
