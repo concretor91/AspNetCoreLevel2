@@ -46,7 +46,7 @@ namespace WebStore.ServiceHosting.Controllers
 
         //[HttpGet("Test/{Start}-{Stop}")] //http://localhost:5001/api/employees/Test/2005.05.07-2007.08.09
         //public ActionResult Test(DateTime Start, DateTime Stop) => Ok();
-
+        [NonAction]
         public void SaveChanges() => _EmployeesData.SaveChanges();
     }
 }
