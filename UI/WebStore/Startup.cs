@@ -41,14 +41,7 @@ namespace WebStore
                 cfg.AddProfile<ViewModelsMapping>();
             }, typeof(Startup));
 
-
-            services.AddDbContext<WebStoreDB>(opt =>
-                opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddTransient<WebStoreDBInitializer>();
-
-            services.AddIdentity<User, Role>(/*opt => { }*/)
-
-               //.AddEntityFrameworkStores<WebStoreDB>()
+            services.AddIdentity<User, Role>()
                .AddDefaultTokenProviders();
 
             services
@@ -98,20 +91,14 @@ namespace WebStore
                .AddRazorRuntimeCompilation();
 
             services.AddScoped<ICartService, CookiesCartService>();
-
             services.AddHttpClient<IValuesService, ValuesClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
-
             services.AddHttpClient<IEmployeesData, EmployeesClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
-
             services.AddHttpClient<IOrderService, OrdersClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
-
             services.AddHttpClient<IProductData, ProductsClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WebStoreDBInitializer db)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            db.Initialize();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -122,14 +109,6 @@ namespace WebStore
             app.UseDefaultFiles();
 
             app.UseWelcomePage("/MVC");
-
-            //app.Use(async (context, next) =>
-            //{
-            //    Debug.WriteLine($"Request to {context.Request.Path}");
-            //    await next(); // Можем прервать конвейер не вызывая await next()
-            //    // постобработка
-            //});
-            //app.UseMiddleware<>()
 
             app.UseRouting();
 
