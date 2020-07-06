@@ -3,8 +3,8 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using WebStore.Domain.Entities;
 using WebStore.Domain.ViewModels;
-using WebStore.Infrastructure.Mapping;
 using WebStore.Interfaces.Services;
+using WebStore.Services.Mapping;
 
 namespace WebStore.Controllers
 {
@@ -43,7 +43,7 @@ namespace WebStore.Controllers
             if (product is null)
                 return NotFound();
 
-            return View(product.ToView());
+            return View(product.FromDTO().ToView());
         }
     }
 }

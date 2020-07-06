@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using WebStore.Data;
 using WebStore.Domain.Entities.Employees;
 using WebStore.Interfaces.Services;
+using WebStore.Services.Data;
 
-namespace WebStore.Infrastructure.Services.InMemory
+namespace WebStore.Services.InMemory
 {
     public class InMemoryEmployeesData : IEmployeesData
     {
@@ -17,10 +17,10 @@ namespace WebStore.Infrastructure.Services.InMemory
 
         public int Add(Employee Employee)
         {
-            if(Employee is null)
+            if (Employee is null)
                 throw new ArgumentNullException(nameof(Employee));
 
-            if (_Employees.Contains(Employee)) 
+            if (_Employees.Contains(Employee))
                 return Employee.Id;
 
             Employee.Id = _Employees.Count == 0 ? 1 : _Employees.Max(e => e.Id) + 1;

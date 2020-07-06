@@ -8,6 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WebStore.Interfaces\WebStore.Interfaces.csproj" />
+    <ProjectReference Include="..\WebStore.Services\WebStore.Services.csproj" />
   </ItemGroup>
 
 
