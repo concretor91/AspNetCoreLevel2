@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
 using System;
 using System.Net.Http;
 using WebStore.Clients.Employees;
@@ -109,7 +110,7 @@ namespace WebStore
             app.UseDefaultFiles();
 
             app.UseWelcomePage("/MVC");
-
+            app.UseSerilogRequestLogging();
             app.UseRouting();
 
             app.UseAuthentication();

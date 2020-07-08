@@ -1,15 +1,19 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using System;
 
 namespace WebStore
 {
     public class Program
     {
-        public static void Main(string[] args) => 
-            CreateHostBuilder(args)
-               .Build()
-               .Run();
+        public static void Main(string[] args)
+        {
+
+                CreateHostBuilder(args).Build().Run();
+        }
+
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
@@ -17,6 +21,9 @@ namespace WebStore
                 .ConfigureWebHostDefaults(host =>
                 {
                     host.UseStartup<Startup>();
+                }).UseSerilog((hostingContext, loggerConfiguration) => {
+                    loggerConfiguration.ReadFrom.Configuration(hostingContext.Configuration)
+                                .Enrich.FromLogContext();
                 });
     }
 }

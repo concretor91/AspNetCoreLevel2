@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using WebStore.Interfaces;
 
 namespace WebStore.Controllers
@@ -10,14 +11,17 @@ namespace WebStore.Controllers
     public class HomeController : Controller
     {
         private readonly IValuesService valuesService;
+        private readonly ILogger<HomeController> logger;
 
-        public HomeController(IValuesService valuesService)
+        public HomeController(IValuesService valuesService, ILogger<HomeController> logger)
         {
             this.valuesService = valuesService;
+            this.logger = logger;
         }
 
         public async Task<IActionResult> Index()
         {
+            logger.LogInformation("sdfsdf");
             var values = await valuesService.GetAsync();
             return View(values);
         }
