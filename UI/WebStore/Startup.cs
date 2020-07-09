@@ -1,5 +1,4 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -7,13 +6,21 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Serilog;
+using System;
+using System.Net.Http;
+using WebStore.Clients.Employees;
+using WebStore.Clients.Identity;
+using WebStore.Clients.Orders;
+using WebStore.Clients.Products;
+using WebStore.Clients.Services.Values;
 using WebStore.DAL.Context;
 using WebStore.Data;
 using WebStore.Domain.Entities.Identity;
 using WebStore.Infrastructure.AutoMapperPropfiles;
-using WebStore.Infrastructure.Services.InCookies;
-using WebStore.Infrastructure.Services.InSQL;
+using WebStore.Interfaces;
 using WebStore.Interfaces.Services;
+using WebStore.Services.Products.InCookies;
 
 namespace WebStore
 {
@@ -23,6 +30,11 @@ namespace WebStore
 
         public Startup(IConfiguration configuration) => Configuration = configuration;
 
+        private Action<HttpClient, string> t = (client, address) =>
+        {
+            client.BaseAddress = new Uri(address);
+        };
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAutoMapper(cfg =>
@@ -30,14 +42,19 @@ namespace WebStore
                 cfg.AddProfile<ViewModelsMapping>();
             }, typeof(Startup));
 
-
-            services.AddDbContext<WebStoreDB>(opt =>
-                opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddTransient<WebStoreDBInitializer>();
-
-            services.AddIdentity<User, Role>(/*opt => { }*/)
-               .AddEntityFrameworkStores<WebStoreDB>()
+            services.AddIdentity<User, Role>()
                .AddDefaultTokenProviders();
+
+            services
+   .AddHttpClient<IUserStore<User>, UsersClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
+            services.AddHttpClient<IUserPasswordStore<User>, UsersClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
+            services.AddHttpClient<IUserEmailStore<User>, UsersClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
+            services.AddHttpClient<IUserPhoneNumberStore<User>, UsersClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
+            services.AddHttpClient<IUserTwoFactorStore<User>, UsersClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
+            services.AddHttpClient<IUserClaimStore<User>, UsersClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
+            services.AddHttpClient<IUserLoginStore<User>, UsersClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
+            services
+               .AddHttpClient<IRoleStore<Role>, RolesClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
 
             services.Configure<IdentityOptions>(opt =>
             {
@@ -74,19 +91,15 @@ namespace WebStore
             services.AddControllersWithViews()
                .AddRazorRuntimeCompilation();
 
-            services.AddScoped<IEmployeesData, SqlEmployeesData>();
-            //services.AddSingleton<IEmployeesData, InMemoryEmployeesData>();
-
-            //services.AddSingleton<IProductData, InMemoryProductData>();
-            services.AddScoped<IProductData, SqlProductData>();
             services.AddScoped<ICartService, CookiesCartService>();
-            services.AddScoped<IOrderService, SqlOrderService>();
+            services.AddHttpClient<IValuesService, ValuesClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
+            services.AddHttpClient<IEmployeesData, EmployeesClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
+            services.AddHttpClient<IOrderService, OrdersClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
+            services.AddHttpClient<IProductData, ProductsClient>(client => client.BaseAddress = new Uri(Configuration["ClientAdress"]));
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WebStoreDBInitializer db)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            db.Initialize();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -97,15 +110,7 @@ namespace WebStore
             app.UseDefaultFiles();
 
             app.UseWelcomePage("/MVC");
-
-            //app.Use(async (context, next) =>
-            //{
-            //    Debug.WriteLine($"Request to {context.Request.Path}");
-            //    await next(); // Можем прервать конвейер не вызывая await next()
-            //    // постобработка
-            //});
-            //app.UseMiddleware<>()
-
+            app.UseSerilogRequestLogging();
             app.UseRouting();
 
             app.UseAuthentication();

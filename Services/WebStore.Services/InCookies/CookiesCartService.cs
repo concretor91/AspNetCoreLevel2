@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 using WebStore.Domain.Entities;
 using WebStore.Domain.Models;
 using WebStore.Domain.ViewModels;
-using WebStore.Infrastructure.Mapping;
 using WebStore.Interfaces.Services;
+using WebStore.Services.Mapping;
 
-namespace WebStore.Infrastructure.Services.InCookies
+namespace WebStore.Services.Products.InCookies
 {
     public class CookiesCartService : ICartService
     {
@@ -57,7 +57,7 @@ namespace WebStore.Infrastructure.Services.InCookies
             var item = cart.Items.FirstOrDefault(i => i.ProductId == id);
 
             if (item is null)
-                cart.Items.Add(new CartItem {ProductId = id, Quantity = 1});
+                cart.Items.Add(new CartItem { ProductId = id, Quantity = 1 });
             else
                 item.Quantity++;
 
@@ -69,7 +69,7 @@ namespace WebStore.Infrastructure.Services.InCookies
             var cart = Cart;
             var item = cart.Items.FirstOrDefault(i => i.ProductId == id);
 
-            if(item is null) return;
+            if (item is null) return;
             if (item.Quantity > 0)
                 item.Quantity--;
             if (item.Quantity == 0)
@@ -103,7 +103,7 @@ namespace WebStore.Infrastructure.Services.InCookies
                 Ids = Cart.Items.Select(item => item.ProductId).ToArray()
             });
 
-            var product_view_models = products.ToView().ToDictionary(p => p.Id);
+            var product_view_models = products.Select(p => p.FromDTO()).ToView().ToDictionary(p => p.Id);
 
             return new CartViewModel
             {

@@ -1,6 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using WebStore.Domain.Entities.Identity;
 using WebStore.Domain.ViewModels.Identity;
 
@@ -10,11 +13,13 @@ namespace WebStore.Controllers
     {
         private readonly UserManager<User> _UserManager;
         private readonly SignInManager<User> _SignInManager;
+        private readonly ILogger<AccountController> logger;
 
-        public AccountController(UserManager<User> UserManager, SignInManager<User> SignInManager)
+        public AccountController(UserManager<User> UserManager, SignInManager<User> SignInManager, ILogger<AccountController> logger)
         {
             _UserManager = UserManager;
             _SignInManager = SignInManager;
+            this.logger = logger;
         }
 
         #region Register new user
@@ -31,12 +36,23 @@ namespace WebStore.Controllers
                 UserName = Model.UserName
             };
 
+            logger.LogInformation($"Начинается процесс регистрации пользователя {user.UserName}");
             var registration_result = await _UserManager.CreateAsync(user, Model.Password);
             if (registration_result.Succeeded)
             {
-                await _UserManager.AddToRoleAsync(user, Role.User);
+                logger.LogInformation($"Пользователь {user.UserName} успешно зарегистрирован");
+                var add_user_role_result = await _UserManager.AddToRoleAsync(user, Role.User);
+                if (add_user_role_result.Succeeded)
+                    logger.LogInformation($"Пользователяю {user.UserName} успешно добавлена роль {Role.User}");
+                else
+                {
+                    logger.LogInformation(
+                        $"Ошибка добавления пользователю {user.UserName} роли {Role.User}:{string.Join(",", add_user_role_result.Errors.Select(x => x.Description))}");
+                    throw new ApplicationException("Ошибка наделения нового пользователя ролью Пользователь");
+                }
 
                 await _SignInManager.SignInAsync(user, false);
+                logger.LogInformation($"Пользователь {user.UserName} успешно зарегистрирован");
                 return RedirectToAction("Index", "Home");
             }
 
@@ -57,6 +73,7 @@ namespace WebStore.Controllers
         {
             if (!ModelState.IsValid) return View(Model);
 
+            logger.LogInformation($"Процесс входа пользователя {Model.UserName}");
             var login_result = await _SignInManager.PasswordSignInAsync(
                 Model.UserName,
                 Model.Password,
@@ -65,9 +82,14 @@ namespace WebStore.Controllers
 
             if (login_result.Succeeded)
             {
+                logger.LogInformation($"Пользователь {Model.UserName} вошел успешно");
                 if (Url.IsLocalUrl(Model.ReturnUrl))
                     return Redirect(Model.ReturnUrl);
                 return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                logger.LogInformation($"Ошибка входа пользователя {Model.UserName}");
             }
 
             ModelState.AddModelError(string.Empty, "Неверное имя пользователя, или пароль!");
